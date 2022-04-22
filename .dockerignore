@@ -1,0 +1,8 @@
+.cloud_storage
+.dockerignore
+
+docker-compose.yml
+
+Dockerfile*
+
+backend.env

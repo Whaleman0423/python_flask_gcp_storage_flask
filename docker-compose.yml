@@ -1,0 +1,44 @@
+version: '3.9'
+
+services:
+  gcp-storage-emulator:
+    image: oittaa/gcp-storage-emulator:v2022.03.28
+    ports:
+      - 9023:9023
+    volumes:
+      - ./.cloud_storage:/storage
+    # command: start --host=0.0.0.0 --port=9023 --in-memory --default-bucket=my-storage # 加上 in-memory 可以不用保存檔案
+    command: start --host=0.0.0.0 --port=9023 --default-bucket=my-bucket
+
+  gcp-firestore-emulator:
+    image: mtlynch/firestore-emulator:20210410
+    environment:
+      - FIRESTORE_PROJECT_ID=my-project-id
+      - PORT=8080
+    ports:
+      - 8080:8080
+    
+  python-flask:
+    build:
+      context: .
+      dockerfile: Dockerfile-dev
+    ports:
+      - 5000:5000
+    depends_on:
+      - gcp-storage-emulator
+      - gcp-firestore-emulator
+    env_file:
+      - backend.env
+    command: python3 app.py
+    
+  ngrok:
+    image: wernight/ngrok:latest
+    ports:
+      - "8888:4040"
+    depends_on:
+      - python-flask
+    environment:
+      NGROK_PROTOCOL: tcp
+      NGROK_PORT: python-flask:5000
+      NGROK_AUTH: 26MVP38dFI9iAt0GpMcXeFPjiOK_5ugK3Tcu2a4GobK9H1tRF
+

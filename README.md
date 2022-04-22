@@ -1,0 +1,1 @@
+Python flask 串接 GCP Cloud Storage、Firestore 小實作
