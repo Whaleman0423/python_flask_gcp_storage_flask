@@ -1,5 +1,5 @@
 version: '3.9'
-
+ 
 services:
   gcp-storage-emulator:
     image: oittaa/gcp-storage-emulator:v2022.03.28

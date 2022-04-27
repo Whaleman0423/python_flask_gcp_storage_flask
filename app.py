@@ -5,10 +5,27 @@ import json
 import itertools
 
 from flask import Flask, jsonify, request
+# 使用 emulator 時，需要引用這個套件的方法來用 
 from google.auth.credentials import AnonymousCredentials
+# GCP 的 Firestore、Cloud Storage API套件
 from google.cloud import firestore
 from google.cloud import storage
 
+"""
+用 Flask 建立一個一個簡易伺服器，透過 Flask 我們獲得一個類似總機的裝置，
+Flask 內部會根據傳送進去 Flask 的 request 判別指向哪個路徑，
+若該路徑有被設置，則會導引至該路徑的功能
+
+邏輯：
+    1. 創建一個 Flask 定義的物件 
+    2. 根據設定好的環境變數，判斷是 development(開發中) 還是 production(生產階段) 
+    3. 根據不同階段，設定 Firestore 物件與 Cloud Storage 物件
+    4. 定義所需的路徑表，並且註明該路徑必須用什麼 http 方法
+    5. 啟動 Flask 的條件式
+"""
+
+
+#創建一個 Flask 定義的物件，這是 Flask 的規則，透過這個物件，我們可以使用它的裝飾器與方法
 app = Flask(__name__)
 
 # 如果是開發階段
@@ -22,15 +39,16 @@ if os.environ["FLASK_ENV"] == "development":
         )
 # 如果是已經要發布的階段
 elif os.environ["FLASK_ENV"] == "production":
-    # 直接連 GCP 上面的 Firestore
+    # 直接連 GCP 上面的 Firestore 和 Cloud Storage時，可以不帶參數，會自動偵測
     db = firestore.Client()
     storage_client = storage.Client()
 
-
+# 定義 / 路徑，此路徑用來測試是否接通 Flask
 @app.route('/')
 def hello_world():
     return 'Hello, world'
 
+# 定義 /users 路徑，GET 方法
 @app.route('/users', methods=['GET'])
 def get_users():
     """取得 Firestore 上 User 資料集的所有用戶資料
@@ -63,8 +81,10 @@ def get_users():
     # 回傳用戶 list
     return jsonify(users_list)
 
+# 定義 /user 路徑，POST 方法
 @app.route('/user', methods=['POST'])
 def save_user():
+    """將用戶資料上傳至 Firestore 資料庫儲存"""
 
     # 與 Firestore 連結
     ref = db.collection(u'User')
@@ -80,8 +100,10 @@ def save_user():
         # 回傳 OK
         return {'message': 'OK'}
 
+# 定義 /users 路徑，POST 方法
 @app.route('/users', methods=['POST'])
 def save_users_json_to_cloud_storage():
+    """將 Firestore 整理成 JSON 檔，儲存至 Cloud Storage"""
 
     # 先從 firestore 取出資料
     # 用戶的資料清單
@@ -122,5 +144,6 @@ def save_users_json_to_cloud_storage():
 
     return {'message': 'Download to cloud storage bucket successfully.'}
 
+# 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=os.environ['DEBUG'])

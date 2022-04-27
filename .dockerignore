@@ -1,3 +1,8 @@
+# 透過 docker 的 copy 特定參數，可以將本地檔案複製到容器內部，讓容器使用
+# 但有時候，我們不需要將容器不會用到的檔案複製進容器
+# 就必須記錄該檔案名稱在 .dockerignore 這裡
+# 記錄後，當啟用 container 時，copy 參數就會忽略這些檔案，而不將這些檔案複製到容器內部
+
 .cloud_storage
 .dockerignore
 

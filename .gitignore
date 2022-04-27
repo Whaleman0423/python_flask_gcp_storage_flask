@@ -1,1 +1,11 @@
+# 當要透過 git add 將資料加到 stage 時，
+# 如果在 .gitignore 記錄不想要上傳到 github 的檔案
+# 則 git add . 將不會被納入要上傳的檔案
+# 透過 git status 查看狀態時，也不會出現該檔案
+# 簡單來說就是要讓 git 忽略這個檔案不讓他上傳到 github 
+
+# 不想讓 .cloud_storage 上傳到 github
 .cloud_storage
+
+# 另外像是一些機密資料，比如密碼或是機密等等，也都會記錄在 .gitignore 這裡
+# 避免機密外洩
