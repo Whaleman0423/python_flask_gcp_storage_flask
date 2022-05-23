@@ -4,12 +4,13 @@ import json
 # 此套件是用來處理生成器的
 import itertools
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_file
 # 使用 emulator 時，需要引用這個套件的方法來用 
 from google.auth.credentials import AnonymousCredentials
 # GCP 的 Firestore、Cloud Storage API套件
 from google.cloud import firestore
 from google.cloud import storage
+from google.api_core.exceptions import NotFound
 
 """
 用 Flask 建立一個一個簡易伺服器，透過 Flask 我們獲得一個類似總機的裝置，
@@ -46,7 +47,7 @@ elif os.environ["FLASK_ENV"] == "production":
 # 定義 / 路徑，此路徑用來測試是否接通 Flask
 @app.route('/')
 def hello_world():
-    return 'Hello, world'
+    return 'Hello, World'
 
 # 定義 /users 路徑，GET 方法
 @app.route('/users', methods=['GET'])
@@ -93,7 +94,7 @@ def save_user():
     user = request.get_json()
     print(user)
     if 'id' not in user:
-        return {'message': '沒有收到用戶 id，請重新上傳！'}
+        return {'message': '沒有收到用戶 id，請重新上傳！'}, 400
     else:
     # 將收到 request json 上傳到 User 資料集，並以 'id' 欄位的值為文件名稱
         ref.document(u'{}'.format(user.get('id'))).set(user)
@@ -144,6 +145,28 @@ def save_users_json_to_cloud_storage():
 
     return {'message': 'Download to cloud storage bucket successfully.'}
 
-# 
+
+# 設置可以上傳資料到 Cloud Storage 的 API
+@app.route('/file/<path:file_path>', methods=['GET'])
+def file_to_from_storage(file_path):
+    """將 file_path 傳入 file_to_from_storage 方法"""
+    try:
+        # 建立值區物件
+        bucket = storage_client.bucket(os.environ['BUCKET_NAME'])
+        # 取得值區內的物件變數
+        blob = bucket.blob(file_path) # 需給該物件在值區裡面的 "路徑"，由於是練習，所以都放在根目錄，直接給檔案名稱即可
+        # 使用 blob 物件變數的 download_to_filename 方法，需給一個下載到哪的路徑的字串參數
+        blob.download_to_filename('/tmp/' + file_path)
+        # 如果成功下載到暫存空間，且檔案存在
+        if os.path.exists('/tmp/' + file_path):
+            # 則傳回檔案給客戶端
+            return send_file('/tmp/' + file_path, as_attachment=True)
+        else:
+            # 若檔案不存在
+            return {"message": "File does not exist."}, 500
+    # 如果 Cloud Storage 值區內沒有該檔案，則會報出 NotFound 的錯誤
+    except NotFound:
+        return {"message": "File does not exist in Cloud Storage."}, 404
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=os.environ['DEBUG'])

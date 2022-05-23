@@ -1,13 +1,8 @@
-# Flask 套件
-click==8.0.3
-colorama==0.4.4
-itsdangerous==2.1.2
-Jinja2==3.0.3
-MarkupSafe==2.1.1
-Werkzeug==2.1.1
 Flask==2.0.2
-
-gunicorn==20.1.0
+protobuf==3.20.1
+pymysql==1.0.2
+SQLAlchemy==1.4.36
+responses==0.20.0
 
 google-auth==2.6.2
 google-cloud-firestore==2.4.0

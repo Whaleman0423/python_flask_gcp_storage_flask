@@ -7,5 +7,12 @@
 # 不想讓 .cloud_storage 上傳到 github
 .cloud_storage
 
+.pytest*
+*__pycache__*
+
 # 另外像是一些機密資料，比如密碼或是機密等等，也都會記錄在 .gitignore 這裡
 # 避免機密外洩
+
+
+cloud_sql_practice/venv
+cloud_sql_practice/cloud-easy-app-cbbc8c934106.json
