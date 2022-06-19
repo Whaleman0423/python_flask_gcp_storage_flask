@@ -6,4 +6,5 @@ COPY . /app
 
 RUN pip install --default-timeout=100 -r requirements.txt
 
-CMD exec gunicorn --bind :$PORT --workers 1 --threads 8 --timeout 0 app:app
+# CMD exec gunicorn --bind :$PORT --workers 1 --threads 8 --timeout 0 app:app
+CMD gunicorn --bind :$PORT --workers 1 --threads 8 --timeout 0 app:app
