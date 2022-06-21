@@ -36,8 +36,11 @@ CREATE TABLE my_table (
 """)
 
 with pool.connect() as db_conn:
-    result = db_conn.execute("SELECT * From my_table").fetchall()
 
+    # db_conn.execute(create_stmt)
+
+    result = db_conn.execute("SELECT * From my_table").fetchall()
+    print(result)
     for row in result:
         print(row)
 connector.close()
