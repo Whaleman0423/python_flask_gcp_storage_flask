@@ -40,5 +40,5 @@ services:
     environment:
       NGROK_PROTOCOL: tcp
       NGROK_PORT: python-flask:5000
-      NGROK_AUTH: 26MVP38dFI9iAt0GpMcXeFPjiOK_5ugK3Tcu2a4GobK9H1tRF
+      NGROK_AUTH: <NGROK_AUTH_ID>
 
